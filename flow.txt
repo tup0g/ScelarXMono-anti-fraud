@@ -1,0 +1,440 @@
+ANTI-FRAUD PROJECT FLOW
+=======================
+
+1) PROJECT STRUCTURE
+--------------------
+anti-fraud/
+├── data/
+│   ├── raw/
+│   │   └── .gitkeep
+│   └── processed/
+│       └── .gitkeep
+├── notebooks/
+│   ├── 01_eda.ipynb
+│   ├── 02_features.ipynb
+│   └── 03_model.ipynb
+├── src/
+│   ├── features.py
+│   └── model.py
+├── outputs/
+│   └── predictions.csv
+├── .gitignore
+├── requirements.txt
+├── README.md
+└── flow.txt
+
+2) FILE CONTENTS
+----------------
+
+FILE: .gitignore
+----------------
+# Data
+/data/raw/*
+!/data/raw/.gitkeep
+/data/processed/*
+!/data/processed/.gitkeep
+
+# Outputs
+/outputs/predictions.csv
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/
+
+
+FILE: README.md
+---------------
+# Anti-Fraud Project
+
+Базова архітектура проєкту для задачі anti-fraud (EDA → feature engineering → modeling → predictions).
+
+## Структура
+
+- `data/raw/` — сирі CSV (не зберігаються в git)
+- `data/processed/` — підготовлені датасети
+- `notebooks/01_eda.ipynb` — розвідковий аналіз
+- `notebooks/02_features.ipynb` — генерація та перевірка фічей
+- `notebooks/03_model.ipynb` — навчання моделі + SHAP
+- `src/features.py` — функції для фічей і препроцесингу
+- `src/model.py` — базовий пайплайн навчання та інференсу
+- `outputs/predictions.csv` — файл із фінальними скорингами
+
+## Швидкий старт
+
+1. Створити віртуальне середовище
+2. Встановити залежності:
+   - `pip install -r requirements.txt`
+3. Покласти CSV у `data/raw/`
+4. Відкрити ноутбук `notebooks/01_eda.ipynb`
+
+
+FILE: requirements.txt
+----------------------
+anyio==4.12.1
+appnope==0.1.4
+argon2-cffi==25.1.0
+argon2-cffi-bindings==25.1.0
+arrow==1.4.0
+asttokens==3.0.1
+async-lru==2.2.0
+attrs==25.4.0
+babel==2.18.0
+beautifulsoup4==4.14.3
+bleach==6.3.0
+certifi==2026.2.25
+cffi==2.0.0
+charset-normalizer==3.4.5
+cloudpickle==3.1.2
+comm==0.2.3
+contourpy==1.3.3
+cycler==0.12.1
+debugpy==1.8.20
+decorator==5.2.1
+defusedxml==0.7.1
+executing==2.2.1
+fastjsonschema==2.21.2
+fonttools==4.62.1
+fqdn==1.5.1
+h11==0.16.0
+httpcore==1.0.9
+httpx==0.28.1
+idna==3.11
+ipykernel==7.2.0
+ipython==9.11.0
+ipython_pygments_lexers==1.1.1
+ipywidgets==8.1.8
+isoduration==20.11.0
+jedi==0.19.2
+Jinja2==3.1.6
+joblib==1.5.3
+json5==0.13.0
+jsonpointer==3.0.0
+jsonschema==4.26.0
+jsonschema-specifications==2025.9.1
+jupyter==1.1.1
+jupyter-console==6.6.3
+jupyter-events==0.12.0
+jupyter-lsp==2.3.0
+jupyter_client==8.8.0
+jupyter_core==5.9.1
+jupyter_server==2.17.0
+jupyter_server_terminals==0.5.4
+jupyterlab==4.5.6
+jupyterlab_pygments==0.3.0
+jupyterlab_server==2.28.0
+jupyterlab_widgets==3.0.16
+kiwisolver==1.5.0
+lark==1.3.1
+lightgbm==4.6.0
+llvmlite==0.46.0
+MarkupSafe==3.0.3
+matplotlib==3.10.8
+matplotlib-inline==0.2.1
+mistune==3.2.0
+nbclient==0.10.4
+nbconvert==7.17.0
+nbformat==5.10.4
+nest-asyncio==1.6.0
+notebook==7.5.5
+notebook_shim==0.2.4
+numba==0.64.0
+numpy==2.4.3
+packaging==26.0
+pandas==3.0.1
+pandocfilters==1.5.1
+parso==0.8.6
+pexpect==4.9.0
+pillow==12.1.1
+platformdirs==4.9.4
+prometheus_client==0.24.1
+prompt_toolkit==3.0.52
+psutil==7.2.2
+ptyprocess==0.7.0
+pure_eval==0.2.3
+pycparser==3.0
+Pygments==2.19.2
+pyparsing==3.3.2
+python-dateutil==2.9.0.post0
+python-json-logger==4.0.0
+PyYAML==6.0.3
+pyzmq==27.1.0
+referencing==0.37.0
+requests==2.32.5
+rfc3339-validator==0.1.4
+rfc3986-validator==0.1.1
+rfc3987-syntax==1.1.0
+rpds-py==0.30.0
+scikit-learn==1.8.0
+scipy==1.17.1
+seaborn==0.13.2
+Send2Trash==2.1.0
+setuptools==82.0.1
+shap==0.51.0
+six==1.17.0
+slicer==0.0.8
+soupsieve==2.8.3
+stack-data==0.6.3
+terminado==0.18.1
+threadpoolctl==3.6.0
+tinycss2==1.4.0
+tornado==6.5.5
+tqdm==4.67.3
+traitlets==5.14.3
+typing_extensions==4.15.0
+tzdata==2025.3
+uri-template==1.3.0
+urllib3==2.6.3
+wcwidth==0.6.0
+webcolors==25.10.0
+webencodings==0.5.1
+websocket-client==1.9.0
+widgetsnbextension==4.0.15
+
+
+FILE: src/features.py
+---------------------
+from __future__ import annotations
+
+import pandas as pd
+from sklearn.compose import ColumnTransformer
+from sklearn.impute import SimpleImputer
+from sklearn.pipeline import Pipeline
+from sklearn.preprocessing import OneHotEncoder, StandardScaler
+
+
+def build_time_features(df: pd.DataFrame, column: str = "transaction_time") -> pd.DataFrame:
+    data = df.copy()
+    if column in data.columns:
+        ts = pd.to_datetime(data[column], errors="coerce")
+        data[f"{column}_hour"] = ts.dt.hour
+        data[f"{column}_dayofweek"] = ts.dt.dayofweek
+        data[f"{column}_is_weekend"] = (ts.dt.dayofweek >= 5).astype("Int64")
+    return data
+
+
+def build_preprocessor(df: pd.DataFrame, target_col: str = "is_fraud") -> ColumnTransformer:
+    feature_df = df.drop(columns=[target_col], errors="ignore")
+    numeric_cols = feature_df.select_dtypes(include=["number"]).columns.tolist()
+    categorical_cols = feature_df.select_dtypes(exclude=["number"]).columns.tolist()
+
+    numeric_pipeline = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="median")),
+            ("scaler", StandardScaler()),
+        ]
+    )
+
+    categorical_pipeline = Pipeline(
+        steps=[
+            ("imputer", SimpleImputer(strategy="most_frequent")),
+            ("onehot", OneHotEncoder(handle_unknown="ignore")),
+        ]
+    )
+
+    return ColumnTransformer(
+        transformers=[
+            ("num", numeric_pipeline, numeric_cols),
+            ("cat", categorical_pipeline, categorical_cols),
+        ]
+    )
+
+
+FILE: src/model.py
+------------------
+from __future__ import annotations
+
+import pandas as pd
+from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import classification_report, roc_auc_score
+from sklearn.model_selection import train_test_split
+from sklearn.pipeline import Pipeline
+
+from src.features import build_preprocessor, build_time_features
+
+
+def train_model(df: pd.DataFrame, target_col: str = "is_fraud"):
+    if target_col not in df.columns:
+        raise ValueError(f"Target column '{target_col}' not found")
+
+    data = build_time_features(df)
+    X = data.drop(columns=[target_col])
+    y = data[target_col]
+
+    X_train, X_valid, y_train, y_valid = train_test_split(
+        X,
+        y,
+        test_size=0.2,
+        random_state=42,
+        stratify=y,
+    )
+
+    preprocessor = build_preprocessor(data, target_col=target_col)
+
+    pipeline = Pipeline(
+        steps=[
+            ("preprocessor", preprocessor),
+            ("model", LogisticRegression(max_iter=300, class_weight="balanced")),
+        ]
+    )
+
+    pipeline.fit(X_train, y_train)
+    valid_pred = pipeline.predict(X_valid)
+    valid_proba = pipeline.predict_proba(X_valid)[:, 1]
+
+    metrics = {
+        "roc_auc": roc_auc_score(y_valid, valid_proba),
+        "classification_report": classification_report(y_valid, valid_pred, output_dict=False),
+    }
+
+    return pipeline, metrics
+
+
+def predict_scores(model: Pipeline, df: pd.DataFrame) -> pd.DataFrame:
+    data = build_time_features(df)
+    scores = model.predict_proba(data)[:, 1]
+    result = df.copy()
+    result["fraud_score"] = scores
+    return result
+
+
+FILE: notebooks/01_eda.ipynb
+----------------------------
+{
+    "cells": [
+        {
+            "cell_type": "markdown",
+            "id": "#VSC-2982f472",
+            "metadata": {
+                "language": "markdown"
+            },
+            "source": [
+                "# 01 — EDA (Exploratory Data Analysis)",
+                "",
+                "Мета: зрозуміти якість даних, дисбаланс класів та ключові патерни шахрайства."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "id": "#VSC-f5bda552",
+            "metadata": {
+                "language": "python"
+            },
+            "source": [
+                "import pandas as pd",
+                "import matplotlib.pyplot as plt",
+                "import seaborn as sns",
+                "",
+                "df = pd.read_csv('../data/raw/transactions.csv')",
+                "df.head()"
+            ]
+        }
+    ]
+}
+
+
+FILE: notebooks/02_features.ipynb
+---------------------------------
+{
+    "cells": [
+        {
+            "cell_type": "markdown",
+            "id": "#VSC-a30cca5d",
+            "metadata": {
+                "language": "markdown"
+            },
+            "source": [
+                "# 02 — Feature Engineering",
+                "",
+                "Мета: створити стабільний пайплайн фічей і зберегти processed-датасет."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "id": "#VSC-e52d6bc6",
+            "metadata": {
+                "language": "python"
+            },
+            "source": [
+                "import pandas as pd",
+                "from src.features import build_time_features",
+                "",
+                "df = pd.read_csv('../data/raw/transactions.csv')",
+                "df_features = build_time_features(df)",
+                "df_features.to_csv('../data/processed/features.csv', index=False)",
+                "df_features.head()"
+            ]
+        }
+    ]
+}
+
+
+FILE: notebooks/03_model.ipynb
+------------------------------
+{
+    "cells": [
+        {
+            "cell_type": "markdown",
+            "id": "#VSC-7d986d91",
+            "metadata": {
+                "language": "markdown"
+            },
+            "source": [
+                "# 03 — Modeling + SHAP",
+                "",
+                "Мета: навчити базову модель, оцінити метрики і пояснити результати через SHAP."
+            ]
+        },
+        {
+            "cell_type": "code",
+            "id": "#VSC-1dd1860c",
+            "metadata": {
+                "language": "python"
+            },
+            "source": [
+                "import pandas as pd",
+                "from src.model import train_model",
+                "",
+                "df = pd.read_csv('../data/processed/features.csv')",
+                "model, metrics = train_model(df, target_col='is_fraud')",
+                "print(metrics['roc_auc'])",
+                "print(metrics['classification_report'])"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "id": "#VSC-4104a1bb",
+            "metadata": {
+                "language": "python"
+            },
+            "source": [
+                "import shap",
+                "",
+                "# Приклад місця для SHAP-аналізу",
+                "# explainer = shap.Explainer(model.named_steps['model'])"
+            ]
+        }
+    ]
+}
+
+
+FILE: outputs/predictions.csv
+-----------------------------
+id,fraud_score
+
+
+FILE: data/raw/.gitkeep
+-----------------------
+(empty)
+
+
+FILE: data/processed/.gitkeep
+-----------------------------
+(empty)

@@ -1,0 +1,20 @@
+# Data
+/data/raw/*
+!/data/raw/.gitkeep
+/data/processed/*
+!/data/processed/.gitkeep
+
+# Outputs
+/outputs/predictions.csv
+
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.egg-info/
+.venv/
+.env
+
+# Jupyter
+.ipynb_checkpoints/

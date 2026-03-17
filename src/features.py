@@ -95,10 +95,20 @@ def extract_features(users_df, tx_df):
         total_transactions=('amount', 'count'),
         total_unique_cards=('card_mask_hash', 'nunique'),
         success_count=('status', lambda x: (x == 'success').sum()),
-        has_fraud_error=('error_group', lambda x: (x == 'fraud').any())
+        has_fraud_error=('error_group', lambda x: (x == 'fraud').any()),
+        max_amount=('amount', 'max'),
+        std_amount=('amount', 'std'),
+        unique_holders=('card_holder', 'nunique'),
+        unique_pay_countries=('payment_country', 'nunique'),
+        card_init_count=('transaction_type', lambda x: (x == 'card_init').sum()),
+        failed_card_init_count=('transaction_type', lambda x: ((x == 'card_init') & (df.loc[x.index, 'status'] == 'fail')).sum()),
     )
     stats['success_rate'] = stats['success_count'] / stats['total_transactions']
     stats['failed_tx_count'] = stats['total_transactions'] - stats['success_count']
+    stats['card_init_rate'] = stats['card_init_count'] / stats['total_transactions']
+    stats['failed_card_init_rate'] = stats['failed_card_init_count'] / stats['total_transactions'].clip(lower=1)
+    stats['cards_per_holder'] = stats['total_unique_cards'] / stats['unique_holders'].clip(lower=1)
+    stats['std_amount'] = stats['std_amount'].fillna(0)
     
     # 5. Token match features (vectorized)
     has_name_email_match = check_name_email_match_vectorized(df)
@@ -120,12 +130,21 @@ def extract_features(users_df, tx_df):
     features['failed_tx_count'] = stats['failed_tx_count']
     features['has_fraud_error'] = stats['has_fraud_error'].astype(int)
     features['has_name_email_match'] = has_name_email_match.reindex(features.index).fillna(False).astype(int)
+    features['max_amount'] = stats['max_amount']
+    features['std_amount'] = stats['std_amount']
+    features['unique_holders'] = stats['unique_holders']
+    features['unique_pay_countries'] = stats['unique_pay_countries']
+    features['card_init_rate'] = stats['card_init_rate']
+    features['failed_card_init_rate'] = stats['failed_card_init_rate']
+    features['cards_per_holder'] = stats['cards_per_holder']
     
     # Fill NaNs for users with no transactions
     cols_to_fill = [
         'is_instant_registration', 'has_night_tx', 'is_country_mismatch', 
         'is_pay_mismatch', 'total_transactions', 'total_unique_cards', 
-        'success_rate', 'failed_tx_count', 'has_fraud_error', 'has_name_email_match'
+        'success_rate', 'failed_tx_count', 'has_fraud_error', 'has_name_email_match',
+        'max_amount', 'std_amount', 'unique_holders', 'unique_pay_countries', 'card_init_rate',
+        'failed_card_init_rate', 'cards_per_holder'
     ]
     features[cols_to_fill] = features[cols_to_fill].fillna(0)
     

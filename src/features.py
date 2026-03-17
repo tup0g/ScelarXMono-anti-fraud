@@ -108,12 +108,15 @@ def extract_features(users_df, tx_df):
     stats['card_init_rate'] = stats['card_init_count'] / stats['total_transactions']
     stats['failed_card_init_rate'] = stats['failed_card_init_count'] / stats['total_transactions'].clip(lower=1)
     stats['cards_per_holder'] = stats['total_unique_cards'] / stats['unique_holders'].clip(lower=1)
+    stats['holder_change_rate'] = stats['unique_holders'] / stats['total_transactions'].clip(lower=1)
     stats['std_amount'] = stats['std_amount'].fillna(0)
     
     # 5. Token match features (vectorized)
     has_name_email_match = check_name_email_match_vectorized(df)
     
     # 6. Combine all features
+    high_fraud_countries = ['Indonesia', 'Ghana', 'Zimbabwe', 'Nigeria', 'Ukraine']
+    users_df['email_domain'] = users_df['email'].str.split('@').str[1].str.lower()
     features = users_df[['id_user', 'traffic_type']].copy()
     if 'is_fraud' in users_df.columns:
         features['is_fraud'] = users_df['is_fraud']
@@ -124,6 +127,9 @@ def extract_features(users_df, tx_df):
     features['has_night_tx'] = has_night_tx.astype(int)
     features['is_country_mismatch'] = is_country_mismatch.astype(int)
     features['is_pay_mismatch'] = is_pay_mismatch.astype(int)
+    features['is_high_fraud_country'] = users_df.set_index('id_user')['reg_country'].isin(high_fraud_countries).astype(int)
+    features['reg_country'] = users_df.set_index('id_user')['reg_country']
+    features['email_domain'] = users_df.set_index('id_user')['email_domain']
     features['total_transactions'] = stats['total_transactions']
     features['total_unique_cards'] = stats['total_unique_cards']
     features['success_rate'] = stats['success_rate']
@@ -137,14 +143,15 @@ def extract_features(users_df, tx_df):
     features['card_init_rate'] = stats['card_init_rate']
     features['failed_card_init_rate'] = stats['failed_card_init_rate']
     features['cards_per_holder'] = stats['cards_per_holder']
+    features['holder_change_rate'] = stats['holder_change_rate']
     
     # Fill NaNs for users with no transactions
     cols_to_fill = [
         'is_instant_registration', 'has_night_tx', 'is_country_mismatch', 
-        'is_pay_mismatch', 'total_transactions', 'total_unique_cards', 
+        'is_pay_mismatch', 'is_high_fraud_country', 'total_transactions', 'total_unique_cards', 
         'success_rate', 'failed_tx_count', 'has_fraud_error', 'has_name_email_match',
         'max_amount', 'std_amount', 'unique_holders', 'unique_pay_countries', 'card_init_rate',
-        'failed_card_init_rate', 'cards_per_holder'
+        'failed_card_init_rate', 'cards_per_holder', 'holder_change_rate'
     ]
     features[cols_to_fill] = features[cols_to_fill].fillna(0)
     
@@ -185,7 +192,15 @@ def main():
     test_features = extract_features(test_users, test_tx)
     
     # 3. Handle categorical encoding (Strict Fit on Train)
-    train_features, test_features = apply_target_encoding(train_features, test_features)
+    train_features, test_features = apply_target_encoding(
+        train_features, test_features, cat_col='traffic_type'
+    )
+    train_features, test_features = apply_target_encoding(
+        train_features, test_features, cat_col='reg_country'
+    )
+    train_features, test_features = apply_target_encoding(
+        train_features, test_features, cat_col='email_domain'
+    )
     
     # 4. Save
     print("Saving processed features...")

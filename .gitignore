@@ -5,7 +5,8 @@
 !/data/processed/.gitkeep
 
 # Outputs
-/outputs/predictions.csv
+/outputs
+/models
 
 # Python
 __pycache__/
